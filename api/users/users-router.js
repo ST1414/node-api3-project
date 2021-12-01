@@ -61,8 +61,6 @@ router.delete('/:id', validateUserId, (req, res) => {
 
 
 router.get('/:id/posts', validateUserId, (req, res) => {
-  // RETURN THE ARRAY OF USER POSTS
-  // this needs a middleware to verify user id
   User.getUserPosts(req.params.id)
     .then( response => {
       res.status(200).json(response);
@@ -72,10 +70,17 @@ router.get('/:id/posts', validateUserId, (req, res) => {
     })
 });
 
-router.post('/:id/posts', validateUserId, (req, res) => {
-  // RETURN THE NEWLY CREATED USER POST
-  // this needs a middleware to verify user id
-  // and another middleware to check that the request body is valid
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+  // req.body.user_id = req.user.id;
+  req.body.user_id = req.params.id;
+
+  Post.insert(req.body)
+    .then( response => {
+      res.status(201).json(response);
+    })
+    .catch( err => {
+      res.status(500).json({ message: 'Error update user posts'})
+    })
 });
 
 // do not forget to export the router
