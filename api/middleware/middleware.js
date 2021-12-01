@@ -8,11 +8,15 @@ function logger(req, res, next) {
 function validateUserId(req, res, next) {
   User.getById(req.params.id)
     .then( response => {
-      req.user = response;
-      next();
+      if (response) {
+        req.user = response;
+        next();
+      } else {
+        res.status(404).json({ message: "user not found" })
+      }
     })
     .catch( err => {  
-      res.status(404).json({ message: "user not found" })
+      res.status(500).json({ message: err.message })
     })
 }
 
